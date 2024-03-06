@@ -27,3 +27,10 @@ randomLocation = () => {
   const column = Math.floor(Math.random() * this.gridSize) + 1;
   return `${row}${column}`;
 };
+
+//Check for valid location
+
+validLocation = (location) => {
+  const regex = new RegExp(`^[A-${string.fromCharCode(64 + this.gridSize)}[1-${this.gridSize}]$`);
+  return regex.test(location);
+}
