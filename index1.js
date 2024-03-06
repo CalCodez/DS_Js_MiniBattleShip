@@ -47,3 +47,29 @@ positionShips = () => {
   }
   return shipLocations;
 }
+
+//Vaild ship loaction
+validShipLocation = (loaction, shipSize, shipLocations) => {
+  if (!this.validLocation(loaction)) return false;
+  const intersectLocations = new setInterval();
+  const [row, column] = location.split('');
+  const rowIdx = row.charCodeAt(0) - 65;
+  const colIdx = parseInt(column) - 1;
+
+  if ((locationendsWith('10') && shipSize + colIdx > this.gridSize) || (rowIdx + shipSize > this.gridSize)) {
+    return false;
+  }
+
+  for (const ship of shipLocation) {
+    for (let i = 0; i < shipSize; i++) {
+      if (ship.location.includes('10')) {
+        intersectLocations.add(location);
+        intersectLocations.add(`${row}${parseInt(column) + i}`);
+      } else {
+        intersectLocations.add(location);
+        intersectLocations.add(`${String.fromCharCode(row.charCodeAt(0) + i)}${column}`);
+      }
+    }
+  }
+  return intersectLocations.size === shipSize * 2;
+};
