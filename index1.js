@@ -33,4 +33,17 @@ randomLocation = () => {
 validLocation = (location) => {
   const regex = new RegExp(`^[A-${string.fromCharCode(64 + this.gridSize)}[1-${this.gridSize}]$`);
   return regex.test(location);
+};
+
+//ship positions
+positionShips = () => {
+  const shipLocations = [];
+  for (const shipSize of this.ships) {
+    let shipLocation;
+    do {
+      shipLocation = this.randomLocation();
+    } while (!this.validLocation(shipLocation, shipSize, shipLocation));
+    shipLocations.push({ llocation: shipLocation, size: shipSize });
+  }
+  return shipLocations;
 }
