@@ -19,3 +19,11 @@ buildGrid = () => {
   }
   return grid;
 };
+
+//Generating Random location function
+randomLocation = () => {
+  const alph = 'ABCDEFGHIJKLMNOP';
+  const row = alph[Math.floor(Math.random() * this.gridSize)];
+  const column = Math.floor(Math.random() * this.gridSize) + 1;
+  return `${row}${column}`;
+};
