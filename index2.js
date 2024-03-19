@@ -1,135 +1,128 @@
-const readline = require('readline');
+const readline = require('readline-sync');
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
+const col = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const row = 'ABCDEFGHIJ';
+let grid = [];
 
-// Function to build the grid
-function buildGrid(size) {
-  let grid = [];
-  for (let i = 0; i < size; i++) {
-    let row = [];
-    for (let j = 0; j < size; j++) {
-      row.push('_');
+//Initialize Grid
+function initGrid() {
+  for (let i = 0; i < row.length; i++) {
+    grid[i] = [];
+    for (let j = 0; j < col.length; j++) {
+      grid[i][j] = ' ';
     }
-    grid.push(row);
   }
-  return grid;
 }
 
-// Function to generate random ship locations
-function generateRandomLocation(size) {
-  const row = Math.floor(Math.random() * size);
-  const col = Math.floor(Math.random() * size);
-  return [row, col];
-}
+//Generate Board Location
+function randoLoc(length) {
+  const direction = Math.random() > 0.5 ? 'horizontal' : 'vertical';
+  const startRow = Math.floor(Math.random() * row.length);
+  const startCol = Math.floor(Math.random() * col.length);
+  const shipLocations = [];
 
-// Function to place ships on the grid
-function placeShips(grid, shipSize) {
-  const size = grid.length;
-  let shipLocations = [];
-
-  for (let i = 0; i < shipSize; i++) {
-    let shipLocation;
-    do {
-      shipLocation = generateRandomLocation(size);
-    } while (!isValidLocation(shipLocations, shipLocation, shipSize, size));
-
-    shipLocations.push(shipLocation);
+  for (let i = 0; i < length; i++) {
+    let newRow = startRow;
+    let newCol = startCol;
+    if (direction === 'horizontal') {
+      newCol += i;
+    } else {
+      newRow += i;
+    }
+    if (newRow >= row.length || newCol >= col.length) {
+      return randoLoc(length);
+    }
+    shipLocations.push(row[newRow] + col[newCol]);
   }
-
   return shipLocations;
 }
 
-// Function to check if ship location is valid
-function isValidLocation(shipLocations, newLocation, shipSize, gridSize) {
-  const newRow = newLocation[0];
-  const newCol = newLocation[1];
-
-  // Check if ship is within grid boundaries
-  if (newRow < 0 || newRow >= gridSize || newCol < 0 || newCol >= gridSize) {
-    return false;
-  }
-
-  // Check if ship intersects with existing ships
-  for (let i = 0; i < shipLocations.length; i++) {
-    const existingLocation = shipLocations[i];
-    const existingRow = existingLocation[0];
-    const existingCol = existingLocation[1];
-
-    if (newRow === existingRow && Math.abs(newCol - existingCol) < shipSize) {
-      return false;
-    }
-
-    if (newCol === existingCol && Math.abs(newRow - existingRow) < shipSize) {
-      return false;
-    }
-  }
-
-  return true;
+function validLocation(location) {
+  const regex = /^[A-J][1-9]$/;
+  return regex.test(location);
 }
 
-// Function to print the grid
-function printGrid(grid) {
-  console.log("  A B C D E F G H I J");
-  for (let i = 0; i < grid.length; i++) {
-    console.log(`${i + 1} ${grid[i].join(' ')}`);
+function initGame() {
+  initGrid();
+  console.log("Press any key to start the game.");
+  readline.keyInPause();
+
+  const shipLengths = [2, 3, 3, 4, 5];
+  let shipsRemaining = shipLengths.length;
+  let ships = [];
+
+  for (let i = 0; i < shipLengths.length; i++) {
+    let newShip;
+    do {
+      newShip = randoLoc(shipLengths[i]);
+    } while (shipOverlap(newShip, ships));
+    ships.push(newShip);
   }
+
+  console.log(`Enter a strike Location ex: "A2" `);
+  playGame(ships);
 }
 
-// Function to check if all ships are destroyed
-function allShipsDestroyed(ships) {
-  return ships.every(ship => ship.length === 0);
-}
-
-// Initialize game variables
-const gridSize = 10;
-const shipSizes = [2, 3, 3, 4, 5];
-let grid = buildGrid(gridSize);
-let ships = [];
-
-// Place ships on the grid
-shipSizes.forEach(shipSize => {
-  const shipLocations = placeShips(grid, shipSize);
-  ships.push(shipLocations);
-});
-
-// Start the game
-console.log("Press any key to start the game.");
-rl.once('line', () => {
-  printGrid(grid);
-  console.log("Enter a location to strike i.e., 'A2'");
-  rl.on('line', (guess) => {
-    const row = parseInt(guess.substring(1)) - 1;
-    const col = guess.charCodeAt(0) - 65;
-
-    if (row < 0 || row >= gridSize || col < 0 || col >= gridSize) {
-      console.log("Invalid guess. Please enter a valid location.");
-      return;
+function shipOverlap(newShip, ships) {
+  for (const ship of ships) {
+    for (const loc of newShip) {
+      if (ship.includes(loc)) {
+        return true;
+      }
     }
+  }
+  return false;
+}
 
+function playGame(ships) {
+  let shipsRemaining = ships.length;
+
+  while (shipsRemaining > 0) {
+    console.log("  1 2 3 4 5 6 7 8 9");
+    for (let i = 0; i < grid.length; i++) {
+      process.stdout.write(row[i] + ' ');
+      for (let j = 0; j < grid[i].length; j++) {
+        process.stdout.write(grid[i][j] + ' ');
+      }
+      console.log('');
+    }
+    const userInput = readline.question("> ");
+    if (!validLocation(userInput)) {
+      console.log(`INVALID INPUT! ENTER VALID LOCATION ex: "B2, C3"`);
+      continue;
+    }
+    const rowIdx = row.indexOf(userInput[0].toUpperCase());
+    const colIdx = parseInt(userInput.slice(1)) - 1;
     let hit = false;
-    ships.forEach(ship => {
-      ship.forEach((location, index) => {
-        if (location[0] === row && location[1] === col) {
-          console.log("Hit! You've sunk a battleship.");
-          ship.splice(index, 1);
-          hit = true;
+    for (const ship of ships) {
+      if (ship.includes(userInput.toUpperCase())) {
+        const locIdx = ship.indexOf(userInput.toUpperCase());
+        ship.splice(locIdx, 1);
+        hit = true;
+        if (ship.length === 0) {
+          shipsRemaining--;
+          console.log(`HIT! You have sunk a battleship. ${shipsRemaining} ships remaining.`);
+        } else {
+          console.log(`HIT!`);
         }
-      });
-    });
-
+        grid[rowIdx][colIdx] = 'X'; // Hit
+        break;
+      }
+    }
     if (!hit) {
-      console.log("You have missed!");
+      grid[rowIdx][colIdx] = 'O'; // Miss
+      console.log(`MISSED! Try again.`)
     }
+  }
+  console.log(`You have destroyed all battleships. Would you like to play again?(Y/N)`);
+  const playAgain = readline.question(`>`).toUpperCase();
+  if (playAgain === 'Y') {
+    initGame();
+  } else {
+    console.log(`Thanks for playing. Goodbye!`)
+    process.exit(0);
+  }
 
-    grid[row][col] = hit ? 'X' : 'O';
-    printGrid(grid);
+}
 
-    if (allShipsDestroyed(ships)) {
-      console.log("Congratulations! You have destroyed all battleships. Would you like to play again? Y/N");
-      rl.close();
-    }
-  });
-});
+initGame();
