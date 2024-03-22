@@ -1,7 +1,6 @@
 const readline = require('readline-sync');
-
-const col = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 const row = 'ABCDEFGHIJ';
+const col = row.split('').map((_item, index) => index + 1)
 let grid = [];
 
 //Initialize Grid
@@ -78,7 +77,7 @@ function playGame(ships) {
   let shipsRemaining = ships.length;
 
   while (shipsRemaining > 0) {
-    console.log("  1 2 3 4 5 6 7 8 9");
+    console.log("  1 2 3 4 5 6 7 8 9 10");
     for (let i = 0; i < grid.length; i++) {
       process.stdout.write(row[i] + ' ');
       for (let j = 0; j < grid[i].length; j++) {
