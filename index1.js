@@ -76,9 +76,9 @@ const handleRepeatedAttacks = (userInput) => {
     attatcks.push(userInput);
   } else {
     console.log('You have already used this location');
-    return false;
+    return true;
   }
-  return true;
+  return false;
 }
 
 const handleValidLocation = (userInput) => {
