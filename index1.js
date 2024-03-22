@@ -1,8 +1,9 @@
 const readline = require('readline-sync');
 
-const col = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-const row = 'ABCDEFGHIJ';
+const col = [1, 2, 3];
+const row = 'ABC';
 let grid = [];
+let attatcks = [];
 
 //Initialize Grid
 function initGrid() {
@@ -22,7 +23,7 @@ function randoLoc(arg1, arg2) {
 }
 
 function validLocation(location) {
-  const regex = /^[A-J][1-9]$/;
+  const regex = /^[A-C][1-3]$/;
   return regex.test(location);
 }
 
@@ -50,7 +51,7 @@ function playGame(ship1, ship2) {
   let shipsRemaining = 2;
 
   while (shipsRemaining > 0) {
-    console.log("  1 2 3 4 5 6 7 8 9");
+    console.log("  1 2 3");
     for (let i = 0; i < grid.length; i++) {
       process.stdout.write(row[i] + ' ');
       for (let j = 0; j < grid[i].length; j++) {
@@ -58,7 +59,14 @@ function playGame(ship1, ship2) {
       }
       console.log('');
     }
-    const userInput = readline.question("> ");
+    const userInput = readline.question("> ").toUpperCase();
+    if (!attatcks.includes(userInput)) {
+      attatcks.push(userInput);
+    } else {
+      console.log('You have already used this location');
+      continue;
+    }
+
     if (!validLocation(userInput)) {
       console.log(`INVALID INPUT! ENTER VALID LOCATION ex: "B2, C3"`);
       continue;
