@@ -1,7 +1,7 @@
 const readline = require('readline-sync');
 const row = 'ABC';
 const col = row.split('').map((_item, index) => index + 1)
-let attatcks = [];
+let attacks = [];
 let shipsRemaining = 0;
 
 //Initialize Grid
@@ -72,8 +72,8 @@ const handleAttacks = (userInput, ship1, ship2, grid, rowIdx, colIdx) => {
 }
 
 const handleRepeatedAttacks = (userInput) => {
-  if (!attatcks.includes(userInput)) {
-    attatcks.push(userInput);
+  if (!attacks.includes(userInput)) {
+    attacks.push(userInput);
   } else {
     console.log('You have already used this location');
     return true;
@@ -92,6 +92,7 @@ const handleValidLocation = (userInput) => {
 
 function playGame(ship1, ship2, row, col, grid) {
   shipsRemaining = 2;
+  attacks = [];
   while (shipsRemaining > 0) {
     console.log("  1 2 3");
     for (let i = 0; i < grid.length; i++) {

@@ -2,6 +2,7 @@ const readline = require('readline-sync');
 const row = 'ABCDEFGHIJ';
 const col = row.split('').map((_item, index) => index + 1)
 let grid = [];
+let attacks = [];
 
 //Initialize Grid
 function initGrid() {
@@ -37,8 +38,11 @@ function randoLoc(length) {
 }
 
 function validLocation(location) {
-  const regex = /^[A-J][1-9]$/;
-  return regex.test(location);
+  const letter = location[0];
+  const number = location.substring(1);
+  const isNumberValid = col.includes(+number);
+  const isLetterValid = row.indexOf(letter) >= 0;
+  return isNumberValid && isLetterValid;
 }
 
 function initGame() {
@@ -73,8 +77,20 @@ function shipOverlap(newShip, ships) {
   return false;
 }
 
+const handleRepeatedAttacks = (userInput) => {
+  if (!attacks.includes(userInput)) {
+    attacks.push(userInput);
+  } else {
+    console.log('You have already used this location');
+    return true;
+  }
+  return false;
+}
+
 function playGame(ships) {
   let shipsRemaining = ships.length;
+  attacks = [];
+
 
   while (shipsRemaining > 0) {
     console.log("  1 2 3 4 5 6 7 8 9 10");
@@ -85,12 +101,16 @@ function playGame(ships) {
       }
       console.log('');
     }
-    const userInput = readline.question("> ");
+    const userInput = readline.question("> ").toUpperCase();
+    if (handleRepeatedAttacks(userInput)) continue;
+
+
     if (!validLocation(userInput)) {
       console.log(`INVALID INPUT! ENTER VALID LOCATION ex: "B2, C3"`);
       continue;
     }
     const rowIdx = row.indexOf(userInput[0].toUpperCase());
+
     const colIdx = parseInt(userInput.slice(1)) - 1;
     let hit = false;
     for (const ship of ships) {
